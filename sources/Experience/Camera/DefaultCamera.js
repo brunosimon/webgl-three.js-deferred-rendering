@@ -10,7 +10,7 @@ export default class DefaultCamera
         this.active = false
 
         this.instance = this.baseInstance.clone()
-        this.instance.position.set(0, 0, 21)
+        this.instance.position.set(15, 15, 15)
         this.instance.rotation.reorder('YXZ')
     }
 

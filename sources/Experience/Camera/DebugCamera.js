@@ -10,8 +10,8 @@ export default class DebugCamera
 
         this.active = false
         this.instance = this.baseInstance.clone()
-        this.instance.position.set(0, 0, 16)
-        this.instance.position.multiplyScalar(1.35)
+        this.instance.position.set(15, 10, 15)
+        // this.instance.position.multiplyScalar(1.35)
         
         this.orbitControls = new OrbitControls(this.instance, this.domElement)
         this.orbitControls.enabled = this.active

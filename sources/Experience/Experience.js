@@ -43,8 +43,12 @@ export default class Experience extends EventEmitter
             powerPreference: 'high-performance'
         })
         this.renderer = new Renderer()
-        this.world = new World()
-        // this.resources = new Resources(this.rendererInstance, assets)
+        this.resources = new Resources(this.rendererInstance, assets)
+
+        this.resources.on('end', () =>
+        {
+            this.world = new World()
+        })
             
         window.addEventListener('resize', () =>
         {
@@ -59,6 +63,9 @@ export default class Experience extends EventEmitter
         this.debug.update()
         this.camera.update()
         this.renderer.update()
+
+        if(this.world)
+            this.world.update()
 
         window.requestAnimationFrame(() =>
         {
