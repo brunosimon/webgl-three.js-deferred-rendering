@@ -7,8 +7,8 @@ struct AmbientLight {
 };
 
 struct HemiLight {
-    vec3 skyColor;
     vec3 groundColor;
+    vec3 skyColor;
     float intensity;
     vec3 direction;
 };
@@ -57,10 +57,17 @@ void main()
     // Gamma corection
     outColor.rgb = pow(outColor.rgb, vec3(1.0 / 2.2));
 
-    pc_FragColor.rgb = color;
-    pc_FragColor.rgb = mix(pc_FragColor.rgb, position, step(0.25, vUv.x));
-    pc_FragColor.rgb = mix(pc_FragColor.rgb, normal, step(0.5, vUv.x));
-    pc_FragColor.rgb = mix(pc_FragColor.rgb, specular, step(0.75, vUv.x));
-    pc_FragColor.rgb = outColor;
+    // Test
+    // outColor = vec3(dot(normal, normalize(vec3(0.0, 1.0, 0.0))));
+
+    #ifdef USE_DEBUG
+        pc_FragColor.rgb = color;
+        pc_FragColor.rgb = mix(pc_FragColor.rgb, position, step(0.25, vUv.x));
+        pc_FragColor.rgb = mix(pc_FragColor.rgb, normal, step(0.5, vUv.x));
+        pc_FragColor.rgb = mix(pc_FragColor.rgb, specular, step(0.75, vUv.x));
+        pc_FragColor.rgb = mix(pc_FragColor.rgb, outColor, step(0.5, vUv.y));
+    #else
+        pc_FragColor.rgb = outColor;
+    #endif
     pc_FragColor.a = 1.0;
 }

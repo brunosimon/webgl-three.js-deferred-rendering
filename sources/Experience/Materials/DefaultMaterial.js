@@ -32,6 +32,14 @@ export default function(_parameters = {})
         uniforms.uMapSpecular = { value: _parameters.mapSpecular }
     }
 
+    // Map normal
+    if(typeof _parameters.mapNormal !== 'undefined')
+    {
+        defines.USE_MAPNORMAL = ''
+
+        uniforms.uMapNormal = { value: _parameters.mapNormal }
+    }
+
     // Final material
     const material = new THREE.RawShaderMaterial({
         glslVersion: THREE.GLSL3,

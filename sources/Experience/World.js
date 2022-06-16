@@ -1,6 +1,7 @@
 import Experience from '@/Experience.js'
 import DefaultMaterial from '@/Materials/DefaultMaterial.js'
 import * as THREE from 'three'
+import Lights from './Lights'
 
 export default class World
 {
@@ -11,6 +12,8 @@ export default class World
         this.resources = this.experience.resources
         this.scene = this.experience.scene
 
+        this.lights = new Lights()
+
         this.setFloor()
         this.setCube()
         this.setTorusKnot()
@@ -20,12 +23,15 @@ export default class World
     setFloor()
     {
         this.floor = {}
+        this.resources.items.groundColor.encoding = THREE.sRGBEncoding
         this.floor.geometry = new THREE.PlaneGeometry(10, 10)
+        this.floor.geometry.computeTangents()
         this.floor.material = new DefaultMaterial({
             // color: 'red',
             mapColor: this.resources.items.groundColor,
             // specular: 1,
-            mapSpecular: this.resources.items.groundSpecular
+            mapSpecular: this.resources.items.groundSpecular,
+            mapNormal: this.resources.items.groundNormal
         })
         this.floor.mesh = new THREE.Mesh(this.floor.geometry, this.floor.material)
         this.floor.mesh.rotation.x = - Math.PI * 0.5
@@ -48,7 +54,7 @@ export default class World
         this.torusKnot.geometry = new THREE.TorusKnotGeometry(0.5, 0.22, 64, 32)
         this.torusKnot.material = new DefaultMaterial({
             specular: 1,
-            color: new THREE.Color('green')
+            color: new THREE.Color('#46a3dd')
         })
         this.torusKnot.mesh = new THREE.Mesh(this.torusKnot.geometry, this.torusKnot.material)
         this.torusKnot.mesh.position.y = 0.5

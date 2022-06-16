@@ -18,7 +18,6 @@ export default class Renderer
         
         this.setInstance()
         this.setComposition()
-        this.setDebug()
     }
 
     setInstance()
@@ -57,25 +56,39 @@ export default class Renderer
         {
             this.debug.stats.setRenderPanel(this.context)
         }
+
+        // Debug
+        if(this.debug.active)
+        {
+            const folder = this.debug.ui.getFolder('renderer')
+            // folder.open()
+
+            folder
+                .addColor(this, 'clearColor')
+                .name('clearColor')
+                .onChange(() =>
+                {
+                    this.instance.setClearColor(this.clearColor)
+                })
+        }
     }
 
     setComposition()
     {
         this.composition = {}
+        this.composition.debug = true
 
         this.composition.renderTargets = new THREE.WebGLMultipleRenderTargets(
             this.viewport.elementWidth,
             this.viewport.elementHeight,
-            4
+            4,
+            {
+                minFilter: THREE.NearestFilter,
+                magFilter: THREE.NearestFilter,
+                // generateMipmaps: false,
+                // encoding: THREE.sRGBEncoding
+            }
         )
-
-        for(const _texture of this.composition.renderTargets.texture)
-        {
-            _texture.minFilter = THREE.NearestFilter
-            _texture.magFilter = THREE.NearestFilter
-            // _texture.generateMipmaps = true
-            // _texture.encoding = THREE.sRGBEncoding
-        }
 
         this.composition.renderTargets.texture[0].name = 'position'
         this.composition.renderTargets.texture[0].type = THREE.FloatType
@@ -90,14 +103,33 @@ export default class Renderer
         this.composition.renderTargets.texture[3].type = THREE.UnsignedByteType
         this.composition.renderTargets.texture[3].format = THREE.RedFormat
 
-
         this.composition.scene = new THREE.Scene()
         this.composition.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
+        this.composition.material = new CompositionMaterial(this.composition.renderTargets, this.composition.debug)
         this.composition.plane = new THREE.Mesh(
             new THREE.PlaneGeometry(2, 2),
-            new CompositionMaterial(this.composition.renderTargets)
+            this.composition.material
         )
         this.composition.scene.add(this.composition.plane)
+
+        // Debug
+        if(this.debug.active)
+        {
+            const folder = this.debug.ui.getFolder('renderer/composition')
+            // folder.open()
+
+            folder
+                .add(this.composition, 'debug')
+                .onChange(() =>
+                {
+                    if(this.composition.debug)
+                        this.composition.material.defines.USE_DEBUG = ''
+                    else
+                        delete this.composition.material.defines.USE_DEBUG
+
+                    this.composition.material.needsUpdate = true
+                })
+        }
     }
 
     resize()
@@ -135,44 +167,5 @@ export default class Renderer
         this.instance.renderLists.dispose()
         this.instance.dispose()
         this.experienceTarget.dispose()
-    }
-
-    setDebug()
-    {
-        const debug = this.experience.debug
-
-        if(!debug.active)
-            return
-
-        // General
-        const folder = debug.ui.getFolder('renderer')
-        // folder.open()
-
-        folder
-            .addColor(this, 'clearColor')
-            .name('clearColor')
-            .onChange(() =>
-            {
-                this.instance.setClearColor(this.clearColor)
-            })
-        
-        // Tone mapping
-        const toneMappingFolder = debug.ui.getFolder('renderer/toneMapping')
-
-        toneMappingFolder
-            .add(
-                this.instance,
-                'toneMapping',
-                {
-                    'NoToneMapping': THREE.NoToneMapping,
-                    'LinearToneMapping': THREE.LinearToneMapping,
-                    'ReinhardToneMapping': THREE.ReinhardToneMapping,
-                    'CineonToneMapping': THREE.CineonToneMapping,
-                    'ACESFilmicToneMapping': THREE.ACESFilmicToneMapping,
-                }
-            )
-            .name('toneMapping')
-
-        toneMappingFolder.add(this.instance, 'toneMappingExposure').min(0).max(5).step(0.001).name('exposure')
     }
 }
