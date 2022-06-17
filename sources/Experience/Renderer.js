@@ -101,7 +101,7 @@ export default class Renderer
         
         this.composition.renderTargets.texture[3].name = 'specular'
         this.composition.renderTargets.texture[3].type = THREE.UnsignedByteType
-        this.composition.renderTargets.texture[3].format = THREE.RedFormat
+        this.composition.renderTargets.texture[3].format = THREE.RGFormat
 
         this.composition.scene = new THREE.Scene()
         this.composition.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)

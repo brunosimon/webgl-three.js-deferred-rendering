@@ -27,6 +27,7 @@ export default class World
         this.floor.geometry = new THREE.PlaneGeometry(10, 10)
         this.floor.geometry.computeTangents()
         this.floor.material = new DefaultMaterial({
+            shininess: 32,
             // color: 'red',
             mapColor: this.resources.items.groundColor,
             // specular: 1,
@@ -45,6 +46,7 @@ export default class World
         this.cube.geometry.computeTangents()
         this.cube.material = new DefaultMaterial({
             specular: 0.25,
+            shininess: 64,
             mapColor: this.resources.items.bricksColor,
             mapSpecular: this.resources.items.bricksSpecular,
             mapNormal: this.resources.items.bricksNormal
@@ -60,8 +62,8 @@ export default class World
         this.torusKnot.geometry = new THREE.TorusKnotGeometry(0.5, 0.22, 128, 32)
         this.torusKnot.geometry.computeTangents()
         this.torusKnot.material = new DefaultMaterial({
-            shininess: 256,
             specular: 1,
+            shininess: 256,
             // color: new THREE.Color('#ffffff')
         })
         this.torusKnot.mesh = new THREE.Mesh(this.torusKnot.geometry, this.torusKnot.material)
@@ -77,6 +79,7 @@ export default class World
         this.sphere.geometry.computeTangents()
         this.sphere.material = new DefaultMaterial({
             specular: 0.25,
+            shininess: 128,
             mapColor: this.resources.items.woodColor,
             mapSpecular: this.resources.items.woodSpecular,
             mapNormal: this.resources.items.woodNormal

@@ -4,7 +4,7 @@ precision highp int;
 layout(location = 0) out vec4 outPosition;
 layout(location = 1) out vec4 outColor;
 layout(location = 2) out vec4 outNormal;
-layout(location = 3) out float outSpecular;
+layout(location = 3) out vec2 outSpecular;
 
 #ifdef USE_MAPCOLOR
     uniform sampler2D uMapColor;
@@ -23,6 +23,7 @@ layout(location = 3) out float outSpecular;
 
 uniform vec3 uColor;
 uniform float uSpecular;
+uniform float uShininess;
 
 in vec3 vPosition;
 in vec2 vUv;
@@ -40,10 +41,10 @@ void main()
     #endif
 
     // Specular
-    outSpecular = uSpecular;
+    outSpecular = vec2(uSpecular, uShininess / 256.0);
 
     #ifdef USE_MAPSPECULAR
-        outSpecular *= texture(uMapSpecular, vUv).r;
+        outSpecular.r *= texture(uMapSpecular, vUv).r;
     #endif
 
     // Normal

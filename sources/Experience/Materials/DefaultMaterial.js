@@ -24,6 +24,10 @@ export default function(_parameters = {})
     const specular = typeof _parameters.specular === 'undefined' ? (typeof _parameters.mapSpecular !== 'undefined' ? 1 : 0) : _parameters.specular
     uniforms.uSpecular = { value: specular }
 
+    // Shininess
+    const shininess = typeof _parameters.shininess === 'undefined' ? 32 : _parameters.shininess
+    uniforms.uShininess = { value: shininess }
+
     // Map specular
     if(typeof _parameters.mapSpecular !== 'undefined')
     {
