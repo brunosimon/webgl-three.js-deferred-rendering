@@ -54,7 +54,7 @@ export default class World
         this.torusKnot.geometry = new THREE.TorusKnotGeometry(0.5, 0.22, 64, 32)
         this.torusKnot.material = new DefaultMaterial({
             specular: 1,
-            color: new THREE.Color('#46a3dd')
+            color: new THREE.Color('#ffffff')
         })
         this.torusKnot.mesh = new THREE.Mesh(this.torusKnot.geometry, this.torusKnot.material)
         this.torusKnot.mesh.position.y = 0.5

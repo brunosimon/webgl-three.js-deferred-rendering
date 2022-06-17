@@ -34,6 +34,36 @@ export default function(_renderTargets, debug = false)
         }
     }
 
+    // Point lights
+    uniforms.uPointLights = {
+        value:
+        [
+            {
+                position: new THREE.Vector3(1, 0.1, - 2),
+                color: new THREE.Color('orange'),
+                intensity: 3,
+                amplitude: 5,
+                concentration: 5
+            },
+            {
+                position: new THREE.Vector3(- 2, 0.1, - 2),
+                color: new THREE.Color('cyan'),
+                intensity: 3,
+                amplitude: 5,
+                concentration: 5
+            },
+            {
+                position: new THREE.Vector3(- 1.5, 0.1, 2),
+                color: new THREE.Color('red'),
+                intensity: 3,
+                amplitude: 5,
+                concentration: 5
+            }
+        ]
+    }
+    uniforms.uPointLightsCount = { value: 3 }
+    defines.MAX_LIGHTS = 3
+
     // Debug
     if(debug)
         defines.USE_DEBUG = ''

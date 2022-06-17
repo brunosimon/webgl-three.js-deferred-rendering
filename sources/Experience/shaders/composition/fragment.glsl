@@ -13,7 +13,13 @@ struct HemiLight {
     vec3 direction;
 };
 
-layout(location = 0) out vec4 pc_FragColor;
+struct PointLight {
+    vec3 position;
+    vec3 color;
+    float intensity;
+    float amplitude;
+    float concentration;
+};
 
 in vec2 vUv;
 
@@ -23,6 +29,10 @@ uniform sampler2D uNormal;
 uniform sampler2D uSpecular;
 uniform AmbientLight uAmbientLight;
 uniform HemiLight uHemiLight;
+uniform PointLight uPointLights[MAX_LIGHTS];
+uniform int uPointLightsCount;
+
+layout(location = 0) out vec4 pc_FragColor;
 
 float inverseLerp(float v, float minValue, float maxValue)
 {
@@ -43,31 +53,50 @@ void main()
     vec3 normal = texture(uNormal, vUv).rgb;
     vec3 specular = texture(uSpecular, vUv).rgb;
 
-    // Base out color
-    vec3 outColor = color;
+    /**
+     * Lights
+     */
+    vec3 light;
 
-    // Ambient and hemi lights
+    // Ambient
     vec3 ambientLightColor = uAmbientLight.color * uAmbientLight.intensity;
+    
+    // Hemi
     vec3 hemiLightDirection = normalize(uHemiLight.direction);
     float hemiLightMix = remap(dot(hemiLightDirection, normal), -1.0, 1.0, 0.0, 1.0);
     vec3 hemiLightColor = mix(uHemiLight.groundColor, uHemiLight.skyColor, hemiLightMix) * uHemiLight.intensity;
 
-    outColor *= ambientLightColor + hemiLightColor;
+    light = ambientLightColor + hemiLightColor;
+
+    // Points
+    for(int i = 0; i < uPointLightsCount; ++i)
+    {
+        float lightDistance = distance(position, uPointLights[i].position);
+        
+        float lightIntensity = 1.0 - clamp(inverseLerp(lightDistance, 0.0, uPointLights[i].amplitude), 0.0, 1.0);
+        lightIntensity = pow(lightIntensity, uPointLights[i].concentration);
+        lightIntensity *= uPointLights[i].intensity;
+        
+        vec3 lightDirection = normalize(uPointLights[i].position - position);
+        
+        light += max(dot(normal, lightDirection), 0.0) * lightIntensity * uPointLights[i].color;
+    }
+    
+    /**
+     * Final color
+     */
+    vec3 outColor = color * light;
 
     // Gamma corection
     outColor.rgb = pow(outColor.rgb, vec3(1.0 / 2.2));
 
-    // Test
-    // outColor = vec3(dot(normal, normalize(vec3(0.0, 1.0, 0.0))));
-
+    // Debug
     #ifdef USE_DEBUG
-        pc_FragColor.rgb = color;
-        pc_FragColor.rgb = mix(pc_FragColor.rgb, position, step(0.25, vUv.x));
-        pc_FragColor.rgb = mix(pc_FragColor.rgb, normal, step(0.5, vUv.x));
-        pc_FragColor.rgb = mix(pc_FragColor.rgb, specular, step(0.75, vUv.x));
-        pc_FragColor.rgb = mix(pc_FragColor.rgb, outColor, step(0.5, vUv.y));
-    #else
-        pc_FragColor.rgb = outColor;
+        outColor.rgb = mix(outColor.rgb, color, step(0.5, 1.0 - vUv.y));
+        outColor.rgb = mix(outColor.rgb, position, step(0.25, vUv.x) * step(0.5, 1.0 - vUv.y));
+        outColor.rgb = mix(outColor.rgb, normal, step(0.5, vUv.x) * step(0.5, 1.0 - vUv.y));
+        outColor.rgb = mix(outColor.rgb, specular, step(0.75, vUv.x) * step(0.5, 1.0 - vUv.y));
     #endif
-    pc_FragColor.a = 1.0;
+
+    pc_FragColor = vec4(outColor, 1.0);
 }

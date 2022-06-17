@@ -12,6 +12,7 @@ export default class Lights
 
         this.setAmbient()
         this.setHemi()
+        this.setPoints()
     }
 
     setAmbient()
@@ -40,7 +41,7 @@ export default class Lights
         this.hemi = {}
         this.hemi.groundColor = new THREE.Color('#3300ff')
         this.hemi.skyColor = new THREE.Color('#ff6600')
-        this.hemi.intensity = 1
+        this.hemi.intensity = 0
         this.hemi.direction = new THREE.Vector3(-0.2, 0.2, 0.09)
         this.hemi.updateUniforms = () =>
         {
@@ -62,6 +63,11 @@ export default class Lights
             folder.add(this.hemi.direction, 'y').min(-1).max(1).step(0.01).onChange(this.hemi.updateUniforms)
             folder.add(this.hemi.direction, 'z').min(-1).max(1).step(0.01).onChange(this.hemi.updateUniforms)
         }
+    }
+
+    setPoints()
+    {
+
     }
 
     update()
