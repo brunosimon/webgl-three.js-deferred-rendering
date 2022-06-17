@@ -64,6 +64,9 @@ export default function(_renderTargets, debug = false)
     uniforms.uPointLightsCount = { value: 3 }
     defines.MAX_LIGHTS = 3
 
+    // View
+    uniforms.viewPosition = { value: new THREE.Vector3(5, 5, -5) }
+
     // Debug
     if(debug)
         defines.USE_DEBUG = ''

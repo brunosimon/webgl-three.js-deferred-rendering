@@ -31,6 +31,7 @@ uniform AmbientLight uAmbientLight;
 uniform HemiLight uHemiLight;
 uniform PointLight uPointLights[MAX_LIGHTS];
 uniform int uPointLightsCount;
+uniform vec3 viewPosition;
 
 layout(location = 0) out vec4 pc_FragColor;
 
@@ -51,12 +52,15 @@ void main()
     vec3 position = texture(uPosition, vUv).rgb;
     vec3 color = texture(uColor, vUv).rgb;
     vec3 normal = texture(uNormal, vUv).rgb;
-    vec3 specular = texture(uSpecular, vUv).rgb;
+    float specular = texture(uSpecular, vUv).r;
+
+    vec3 viewDirection = normalize(viewPosition - position);
 
     /**
      * Lights
      */
     vec3 light;
+    vec3 specularLight = vec3(0.0);
 
     // Ambient
     vec3 ambientLightColor = uAmbientLight.color * uAmbientLight.intensity;
@@ -80,12 +84,17 @@ void main()
         vec3 lightDirection = normalize(uPointLights[i].position - position);
         
         light += max(dot(normal, lightDirection), 0.0) * lightIntensity * uPointLights[i].color;
+
+        vec3 reflection = normalize(reflect(- lightDirection, normal));
+        float specularIntensity = max(0.0, dot(viewDirection, reflection));
+        specularIntensity = pow(specularIntensity, 1.0 + 128.0 * specular);
+        specularLight += specularIntensity * uPointLights[i].color * specular;
     }
     
     /**
      * Final color
      */
-    vec3 outColor = color * light;
+    vec3 outColor = color * light + specularLight;
 
     // Gamma corection
     outColor.rgb = pow(outColor.rgb, vec3(1.0 / 2.2));
@@ -95,7 +104,7 @@ void main()
         outColor.rgb = mix(outColor.rgb, color, step(0.5, 1.0 - vUv.y));
         outColor.rgb = mix(outColor.rgb, position, step(0.25, vUv.x) * step(0.5, 1.0 - vUv.y));
         outColor.rgb = mix(outColor.rgb, normal, step(0.5, vUv.x) * step(0.5, 1.0 - vUv.y));
-        outColor.rgb = mix(outColor.rgb, specular, step(0.75, vUv.x) * step(0.5, 1.0 - vUv.y));
+        outColor.rgb = mix(outColor.rgb, vec3(specular), step(0.75, vUv.x) * step(0.5, 1.0 - vUv.y));
     #endif
 
     pc_FragColor = vec4(outColor, 1.0);

@@ -148,6 +148,8 @@ export default class Renderer
         if(this.debug.stats)
             this.debug.stats.beforeRender()
 
+        this.composition.material.uniforms.viewPosition.value.copy(this.camera.instance.position)
+
         // Render scene
         this.instance.setRenderTarget(this.composition.renderTargets)
         this.instance.render(this.scene, this.camera.instance)
