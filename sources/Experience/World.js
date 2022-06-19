@@ -11,6 +11,7 @@ export default class World
         this.renderer = this.experience.renderer
         this.resources = this.experience.resources
         this.scene = this.experience.scene
+        this.debug = this.experience.debug
 
         this.lights = new Lights()
 
@@ -54,6 +55,15 @@ export default class World
         this.cube.mesh = new THREE.Mesh(this.cube.geometry, this.cube.material)
         this.cube.mesh.position.y = 0.5
         this.scene.add(this.cube.mesh)
+
+        if(this.debug.active)
+        {
+            const folder = this.debug.ui.getFolder('world/cube')
+
+            folder.add(this.cube.material.uniforms.uSpecular, 'value').min(0).max(1).step(0.001).name('specular')
+            folder.add(this.cube.material.uniforms.uShininess, 'value').min(0).max(256).step(1).name('shininess')
+            folder.addColor(this.cube.material.uniforms.uColor, 'value').name('color')
+        }
     }
 
     setTorusKnot()
@@ -70,6 +80,15 @@ export default class World
         this.torusKnot.mesh.position.y = 0.5
         this.torusKnot.mesh.position.x = 2
         this.scene.add(this.torusKnot.mesh)
+
+        if(this.debug.active)
+        {
+            const folder = this.debug.ui.getFolder('world/torusKnot')
+
+            folder.add(this.torusKnot.material.uniforms.uSpecular, 'value').min(0).max(1).step(0.001).name('specular')
+            folder.add(this.torusKnot.material.uniforms.uShininess, 'value').min(0).max(256).step(1).name('shininess')
+            folder.addColor(this.torusKnot.material.uniforms.uColor, 'value').name('color')
+        }
     }
 
     setSphere()
