@@ -6,7 +6,7 @@ export default class Lights
     constructor()
     {
         this.experience = new Experience()
-        this.scene = this.experience.scene
+        this.scenes = this.experience.scenes
         this.debug = this.experience.debug
         this.renderer = this.experience.renderer
 
@@ -67,7 +67,13 @@ export default class Lights
 
     setPoints()
     {
-
+        this.test = {}
+        this.test.geometry = new THREE.SphereGeometry(0.75, 32, 32)
+        this.test.material = new THREE.MeshBasicMaterial({ color: 'lime' })
+        this.test.mesh = new THREE.Mesh(this.test.geometry, this.test.material)
+        this.test.mesh.position.y = 0.5
+        this.test.mesh.position.x = -1
+        this.scenes.forward.add(this.test.mesh)
     }
 
     update()

@@ -10,7 +10,7 @@ export default class World
         this.experience = new Experience()
         this.renderer = this.experience.renderer
         this.resources = this.experience.resources
-        this.scene = this.experience.scene
+        this.scenes = this.experience.scenes
         this.debug = this.experience.debug
 
         this.lights = new Lights()
@@ -37,7 +37,7 @@ export default class World
         })
         this.floor.mesh = new THREE.Mesh(this.floor.geometry, this.floor.material)
         this.floor.mesh.rotation.x = - Math.PI * 0.5
-        this.scene.add(this.floor.mesh)
+        this.scenes.deferred.add(this.floor.mesh)
     }
 
     setCube()
@@ -54,7 +54,7 @@ export default class World
         })
         this.cube.mesh = new THREE.Mesh(this.cube.geometry, this.cube.material)
         this.cube.mesh.position.y = 0.5
-        this.scene.add(this.cube.mesh)
+        this.scenes.deferred.add(this.cube.mesh)
 
         if(this.debug.active)
         {
@@ -79,7 +79,7 @@ export default class World
         this.torusKnot.mesh = new THREE.Mesh(this.torusKnot.geometry, this.torusKnot.material)
         this.torusKnot.mesh.position.y = 0.5
         this.torusKnot.mesh.position.x = 2
-        this.scene.add(this.torusKnot.mesh)
+        this.scenes.deferred.add(this.torusKnot.mesh)
 
         if(this.debug.active)
         {
@@ -106,7 +106,7 @@ export default class World
         this.sphere.mesh = new THREE.Mesh(this.sphere.geometry, this.sphere.material)
         this.sphere.mesh.position.y = 0.5
         this.sphere.mesh.position.x = -2
-        this.scene.add(this.sphere.mesh)
+        this.scenes.deferred.add(this.sphere.mesh)
     }
 
     update()

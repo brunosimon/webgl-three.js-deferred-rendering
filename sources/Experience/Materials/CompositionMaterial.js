@@ -74,6 +74,9 @@ export default function(_renderTargets, debug = false)
     // Final material
     const material = new THREE.RawShaderMaterial({
         glslVersion: THREE.GLSL3,
+        depthWrite: false,
+        depthTest: false,
+        // transparent: true,
         uniforms,
         defines,
         vertexShader,

@@ -13,7 +13,7 @@ export default class Camera
         this.time = this.experience.time
         this.viewport = this.experience.viewport
         this.domElement = this.experience.domElement
-        this.scene = this.experience.scene
+        this.scenes = this.experience.scenes
 
         // Set up
         this.mode = 'debugCamera' // defaultCamera \ debugCamera
@@ -37,7 +37,7 @@ export default class Camera
         )
         this.instance.rotation.reorder('YXZ')
 
-        this.scene.add(this.instance)
+        this.scenes.deferred.add(this.instance)
     }
 
     setDefaultCamera()
