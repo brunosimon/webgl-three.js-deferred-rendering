@@ -147,7 +147,7 @@ export default class World
     setForwardSphere()
     {
         this.forwardSphere = {}
-        this.forwardSphere.geometry = new THREE.SphereGeometry(0.75, 32, 32)
+        this.forwardSphere.geometry = new THREE.SphereGeometry(0.49, 32, 32)
         this.forwardSphere.material = new THREE.MeshBasicMaterial({ color: 'lime' })
         this.forwardSphere.mesh = new THREE.Mesh(this.forwardSphere.geometry, this.forwardSphere.material)
         this.forwardSphere.mesh.position.y = 0.5
@@ -166,5 +166,7 @@ export default class World
             _point.position.z = Math.cos(_point.angle) * _point.distance
             // _point.position.y = 0.25
         }
+
+        this.forwardSphere.mesh.position.x = Math.sin(this.time.elapsed) * 4
     }
 }

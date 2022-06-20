@@ -2,6 +2,7 @@ import * as THREE from 'three'
 
 import Experience from '@/Experience.js'
 import CompositionMaterial from './Materials/CompositionMaterial.js'
+import FinalMaterial from './Materials/FinalMaterial.js'
 
 export default class Renderer
 {
@@ -15,9 +16,11 @@ export default class Renderer
         this.debug = this.experience.debug
         this.time = this.experience.time
         this.camera = this.experience.camera
-        
+
         this.setInstance()
+        this.setDeferred()
         this.setComposition()
+        this.setFinal()
     }
 
     setInstance()
@@ -35,9 +38,9 @@ export default class Renderer
         this.instance.domElement.style.height = '100%'
 
         // this.instance.setClearColor(0x414141, 1)
-        this.instance.autoClear = false
+        // this.instance.autoClear = false
         this.instance.setClearColor(this.clearColor, 0)
-        // this.instance.setClearAlpha(0)
+        this.instance.setClearAlpha(0)
         this.instance.setSize(this.viewport.elementWidth, this.viewport.elementHeight)
         this.instance.setPixelRatio(this.viewport.clampedPixelRatio)
 
@@ -75,12 +78,13 @@ export default class Renderer
         }
     }
 
-    setComposition()
+    setDeferred()
     {
-        this.composition = {}
-        this.composition.debug = false
+        this.deferred = {}
+        this.deferred.debug = false
 
-        this.composition.renderTargets = new THREE.WebGLMultipleRenderTargets(
+        this.deferred.depthTexture = new THREE.DepthTexture(this.viewport.elementWidth, this.viewport.elementHeight)
+        this.deferred.renderTarget = new THREE.WebGLMultipleRenderTargets(
             this.viewport.elementWidth,
             this.viewport.elementHeight,
             4,
@@ -92,25 +96,45 @@ export default class Renderer
             }
         )
 
-        this.composition.renderTargets.texture[0].name = 'position'
-        this.composition.renderTargets.texture[0].type = THREE.FloatType
+        this.deferred.renderTarget.depthTexture = this.deferred.depthTexture
 
-        this.composition.renderTargets.texture[1].name = 'color'
-        this.composition.renderTargets.texture[1].type = THREE.UnsignedByteType
-        
-        this.composition.renderTargets.texture[2].name = 'normal'
-        this.composition.renderTargets.texture[2].type = THREE.FloatType
-        
-        this.composition.renderTargets.texture[3].name = 'specular'
-        this.composition.renderTargets.texture[3].type = THREE.UnsignedByteType
-        this.composition.renderTargets.texture[3].format = THREE.RGFormat
+        this.deferred.renderTarget.texture[0].name = 'position'
+        this.deferred.renderTarget.texture[0].type = THREE.FloatType
 
-        this.composition.camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1)
-        this.composition.material = new CompositionMaterial(this.composition.renderTargets, this.composition.debug)
+        this.deferred.renderTarget.texture[1].name = 'color'
+        this.deferred.renderTarget.texture[1].type = THREE.UnsignedByteType
+        
+        this.deferred.renderTarget.texture[2].name = 'normal'
+        this.deferred.renderTarget.texture[2].type = THREE.FloatType
+        
+        this.deferred.renderTarget.texture[3].name = 'specular'
+        this.deferred.renderTarget.texture[3].type = THREE.UnsignedByteType
+        this.deferred.renderTarget.texture[3].format = THREE.RGFormat
+    }
+
+    setComposition()
+    {
+        this.composition = {}
+        this.composition.debug = false
+
+        this.composition.renderTarget = new THREE.WebGLRenderTarget(
+            this.viewport.elementWidth,
+            this.viewport.elementHeight,
+            {
+                minFilter: THREE.NearestFilter,
+                magFilter: THREE.NearestFilter,
+                // generateMipmaps: false,
+                // encoding: THREE.sRGBEncoding
+            }
+        )
+        this.composition.renderTarget.depthTexture = this.deferred.depthTexture
+
+        this.composition.material = new CompositionMaterial(this.deferred.renderTarget, this.composition.debug)
         this.composition.plane = new THREE.Mesh(
             new THREE.PlaneGeometry(2, 2),
             this.composition.material
         )
+        this.composition.plane.frustumCulled = false
         this.scenes.composition.add(this.composition.plane)
 
         // Debug
@@ -133,6 +157,18 @@ export default class Renderer
         }
     }
 
+    setFinal()
+    {
+        this.final = {}
+        this.final.material = new FinalMaterial(this.composition.renderTarget)
+        this.final.plane = new THREE.Mesh(
+            new THREE.PlaneGeometry(2, 2),
+            this.final.material
+        )
+        this.final.plane.frustumCulled = false
+        this.scenes.final.add(this.final.plane)
+    }
+
     resize()
     {
         const bounding = this.domElement.getBoundingClientRect()
@@ -146,62 +182,29 @@ export default class Renderer
 
     update()
     {
+        // Stats
         if(this.debug.stats)
             this.debug.stats.beforeRender()
         
-        this.composition.material.uniforms.viewPosition.value.copy(this.camera.instance.position)
-        
-        // this.instance.clearDepth()
-        // Deffered render
-        this.instance.setRenderTarget(this.composition.renderTargets)
-        this.instance.clear()
+        // Deferred render
+        this.instance.setRenderTarget(this.deferred.renderTarget)
         this.instance.render(this.scenes.deferred, this.camera.instance)
-        
+        this.instance.autoClear = false
+
         // Composition render
-        this.instance.setRenderTarget(null)
-        this.instance.clear()
-        this.instance.render(this.scenes.composition, this.composition.camera)
-        
-        // Forward render
-        if(!test)
-        {
-            test = true
-            // console.log('-----')
-            // console.log(this.context)
-            // console.log(this.instance.state)
-            // console.log(this.context.READ_FRAMEBUFFER)
-            // console.log(this.context.DEPTH_BUFFER_BIT)
-            // console.log(this.context.STENCIL_BUFFER_BIT)
-            // console.log(this.context.DRAW_FRAMEBUFFER)
-            // console.log(this.context.NEAREST)
-            // console.log(this.context.FRAMEBUFFER)
-            // console.log(this.instance.state.bindFramebuffer)
-            // console.log(this.context.bindFramebuffer)
-            // console.log(this.context.blitFramebuffer)
-            // console.log(this.instance.properties.get(this.composition.renderTargets))
-            // console.log(this.composition.renderTargets)
-            // console.log('-----')
-
-            // glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer);
-            // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0); // write to default framebuffer
-            // glBlitFramebuffer(
-            // 0, 0, SCR_WIDTH, SCR_HEIGHT, 0, 0, SCR_WIDTH, SCR_HEIGHT, GL_DEPTH_BUFFER_BIT, GL_NEAREST
-            // );
-            // glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        this.composition.material.uniforms.viewPosition.value.copy(this.camera.instance.position)
+        this.instance.setRenderTarget(this.composition.renderTarget)
+        this.instance.render(this.scenes.composition, this.camera.instance)
             
-            this.context.bindFramebuffer(this.context.READ_FRAMEBUFFER, this.instance.properties.get(this.composition.renderTargets).__webglFramebuffer)
-            this.context.bindFramebuffer(this.context.DRAW_FRAMEBUFFER, null)
-            this.context.blitFramebuffer(
-                0, 0, this.viewport.elementWidth, this.viewport.elementHeight,
-                0, 0, this.viewport.elementWidth, this.viewport.elementHeight,
-                this.context.DEPTH_BUFFER_BIT,
-                this.context.NEAREST
-            )
-            this.context.bindFramebuffer(this.context.FRAMEBUFFER, null)
-        }
+        // Forward render
+        this.instance.render(this.scenes.forward, this.camera.instance)
+        this.instance.autoClear = true
 
-        // this.instance.render(this.scenes.forward, this.camera.instance)
-
+        // Final render
+        this.instance.setRenderTarget(null)
+        this.instance.render(this.scenes.final, this.camera.instance)
+        
+        // Stats
         if(this.debug.stats)
             this.debug.stats.afterRender()
     }
@@ -213,5 +216,3 @@ export default class Renderer
         this.experienceTarget.dispose()
     }
 }
-
-let test = false

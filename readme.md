@@ -18,8 +18,9 @@ npm run build
 
 ## TODO
 
-- [ ] Point lights
-- [ ] Point lights stress test
+- [x] Point lights
+- [x] Point lights stress test
+- [ ] Resize
 - [ ] Forward rendering
 - [ ] Forward rendering with depth
 - [ ] Point light forward rendering

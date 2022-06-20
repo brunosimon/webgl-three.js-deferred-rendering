@@ -36,12 +36,13 @@ export default class Experience extends EventEmitter
         this.scenes = {
             deferred: new THREE.Scene(),
             forward: new THREE.Scene(),
-            composition: new THREE.Scene()
+            composition: new THREE.Scene(),
+            final: new THREE.Scene()
         }
         this.camera = new Camera()
         this.time = new Time()
         this.rendererInstance = new THREE.WebGLRenderer({
-            // stencil: false,
+            stencil: false,
             // alpha: true,
             // antialias: true,
             powerPreference: 'high-performance'
