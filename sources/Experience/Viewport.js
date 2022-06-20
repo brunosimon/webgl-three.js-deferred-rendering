@@ -25,7 +25,7 @@ export default class Viewport
         this.smallestSide = this.width < this.height ? this.width : this.height
         this.biggestSide = this.width > this.height ? this.width : this.height
         this.pixelRatio = window.devicePixelRatio
-        this.clampedPixelRatio = Math.min(this.pixelRatio, 2)
+        this.clampedPixelRatio = Math.min(this.pixelRatio, 1)
         this.vertical = this.width / this.height < 0.8
 
         if(this.vertical)

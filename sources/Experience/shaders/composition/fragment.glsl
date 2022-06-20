@@ -29,9 +29,12 @@ uniform sampler2D uNormal;
 uniform sampler2D uSpecular;
 uniform AmbientLight uAmbientLight;
 uniform HemiLight uHemiLight;
-uniform PointLight uPointLights[MAX_LIGHTS];
-uniform int uPointLightsCount;
 uniform vec3 viewPosition;
+
+#if (MAX_LIGHTS > 0)
+    uniform int uPointLightsCount;
+    uniform PointLight uPointLights[MAX_LIGHTS];
+#endif
 
 layout(location = 0) out vec4 pc_FragColor;
 
@@ -76,23 +79,25 @@ void main()
     light = ambientLightColor + hemiLightColor;
 
     // Points
-    for(int i = 0; i < uPointLightsCount; ++i)
-    {
-        float lightDistance = distance(position, uPointLights[i].position);
-        
-        float lightIntensity = 1.0 - clamp(inverseLerp(lightDistance, 0.0, uPointLights[i].amplitude), 0.0, 1.0);
-        lightIntensity = pow(lightIntensity, uPointLights[i].concentration);
-        lightIntensity *= uPointLights[i].intensity;
-        
-        vec3 lightDirection = normalize(uPointLights[i].position - position);
-        
-        light += max(dot(normal, lightDirection), 0.0) * lightIntensity * uPointLights[i].color;
+    #if (MAX_LIGHTS > 0)
+        for(int i = 0; i < uPointLightsCount; ++i)
+        {
+            float lightDistance = distance(position, uPointLights[i].position);
+            
+            float lightIntensity = 1.0 - clamp(inverseLerp(lightDistance, 0.0, uPointLights[i].amplitude), 0.0, 1.0);
+            lightIntensity = pow(lightIntensity, uPointLights[i].concentration);
+            lightIntensity *= uPointLights[i].intensity;
+            
+            vec3 lightDirection = normalize(uPointLights[i].position - position);
+            
+            light += max(dot(normal, lightDirection), 0.0) * lightIntensity * uPointLights[i].color;
 
-        vec3 reflection = normalize(reflect(- lightDirection, normal));
-        float specularIntensity = max(0.0, dot(viewDirection, reflection));
-        specularIntensity = pow(specularIntensity, 1.0 + shininess * 256.0 * specular);
-        specularLight += specularIntensity * uPointLights[i].color * specular;
-    }
+            vec3 reflection = normalize(reflect(- lightDirection, normal));
+            float specularIntensity = max(0.0, dot(viewDirection, reflection));
+            specularIntensity = pow(specularIntensity, 1.0 + shininess * 256.0 * specular);
+            specularLight += specularIntensity * uPointLights[i].color * specular;
+        }
+    #endif
     
     /**
      * Final color

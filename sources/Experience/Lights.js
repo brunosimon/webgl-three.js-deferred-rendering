@@ -67,16 +67,96 @@ export default class Lights
 
     setPoints()
     {
-        this.test = {}
-        this.test.geometry = new THREE.SphereGeometry(0.75, 32, 32)
-        this.test.material = new THREE.MeshBasicMaterial({ color: 'lime' })
-        this.test.mesh = new THREE.Mesh(this.test.geometry, this.test.material)
-        this.test.mesh.position.y = 0.5
-        this.test.mesh.position.x = -1
-        this.scenes.forward.add(this.test.mesh)
+        this.points = {}
+        this.points.max = 100
+        this.points.items = []
+        this.points.needsUpdate = false
+
+        this.points.create = (_parameters = {}) =>
+        {
+            const point = {}
+
+            // Position
+            if(typeof _parameters.position !== 'undefined' || !(_parameters.position instanceof THREE.Vector3))
+                point.position = new THREE.Vector3()
+            else
+                point.position = _parameters.position
+            
+            // Color
+            if(typeof _parameters.color === 'undefined')
+                point.color = new THREE.Color(0xffffff)
+            else if(_parameters.color instanceof THREE.Color)
+            {
+                point.color = _parameters.color
+            }
+            else
+            {
+                point.color = new THREE.Color(_parameters.color)
+            }
+            
+            // Intensity
+            if(typeof _parameters.intensity === 'number')
+                point.intensity = _parameters.intensity
+            else
+                point.intensity = 3
+            
+            // Amplitude
+            if(typeof _parameters.amplitude === 'number')
+                point.amplitude = _parameters.amplitude
+            else
+                point.amplitude = 5
+            
+            // Concentration
+            if(typeof _parameters.concentration === 'number')
+                point.concentration = _parameters.concentration
+            else
+                point.concentration = 5
+           
+            this.points.items.push(point)
+
+            // Update
+            this.points.needsUpdate = true
+
+            // Return
+            return point
+        }
+        
+        this.points.updateUniforms = () =>
+        {
+            // Count
+            this.renderer.composition.material.uniforms.uPointLightsCount.value = this.points.items.length
+
+            // Lights
+            const uPointLights = [...this.points.items]
+            
+            const dummyLight = {
+                position: new THREE.Vector3(0, 0, 0),
+                color: new THREE.Color(),
+                intensity: 0,
+                amplitude: 0,
+                concentration: 0
+            }
+
+            // Fill with dummy lights
+            for(let i = this.points.items.length; i < this.points.max; i++)
+                uPointLights.push(dummyLight)
+            this.renderer.composition.material.uniforms.uPointLights.value = uPointLights
+
+            // Max changed
+            if(this.points.max !== this.renderer.composition.material.defines.MAX_LIGHTS)
+            {
+                this.renderer.composition.material.defines.MAX_LIGHTS = this.points.max
+                this.renderer.composition.material.needsUpdate = true
+            }
+        }
     }
 
     update()
     {
+        if(this.points.needsUpdate)
+        {
+            this.points.needsUpdate = false
+            this.points.updateUniforms()
+        }
     }
 }

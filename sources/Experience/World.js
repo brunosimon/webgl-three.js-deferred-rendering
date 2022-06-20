@@ -12,13 +12,35 @@ export default class World
         this.resources = this.experience.resources
         this.scenes = this.experience.scenes
         this.debug = this.experience.debug
+        this.time = this.experience.time
 
-        this.lights = new Lights()
-
+        this.setLights()
         this.setFloor()
         this.setCube()
         this.setTorusKnot()
         this.setSphere()
+        this.setForwardSphere()
+    }
+
+    setLights()
+    {
+        this.lights = new Lights()
+
+        this.pointLights = []
+
+        for(let i = 0; i < 100; i++)
+        {
+            const point = this.lights.points.create({
+                color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                amplitude: 2
+            })
+            point.angle = Math.random() * Math.PI * 2
+            point.distance = (1 - Math.pow(1 - Math.random(), 2)) * 5
+            point.speed = Math.random() * 1
+
+            this.pointLights.push(point)
+        }
+        
     }
 
     setFloor()
@@ -28,16 +50,24 @@ export default class World
         this.floor.geometry = new THREE.PlaneGeometry(10, 10)
         this.floor.geometry.computeTangents()
         this.floor.material = new DefaultMaterial({
-            shininess: 32,
+            shininess: 150,
             // color: 'red',
             mapColor: this.resources.items.groundColor,
-            // specular: 1,
+            specular: 0.1,
             mapSpecular: this.resources.items.groundSpecular,
             mapNormal: this.resources.items.groundNormal
         })
         this.floor.mesh = new THREE.Mesh(this.floor.geometry, this.floor.material)
         this.floor.mesh.rotation.x = - Math.PI * 0.5
         this.scenes.deferred.add(this.floor.mesh)
+
+        if(this.debug.active)
+        {
+            const folder = this.debug.ui.getFolder('world/floor')
+
+            folder.add(this.floor.material.uniforms.uSpecular, 'value').min(0).max(1).step(0.001).name('specular')
+            folder.add(this.floor.material.uniforms.uShininess, 'value').min(0).max(256).step(1).name('shininess')
+        }
     }
 
     setCube()
@@ -109,7 +139,27 @@ export default class World
         this.scenes.deferred.add(this.sphere.mesh)
     }
 
+    setForwardSphere()
+    {
+        this.forwardSphere = {}
+        this.forwardSphere.geometry = new THREE.SphereGeometry(0.75, 32, 32)
+        this.forwardSphere.material = new THREE.MeshBasicMaterial({ color: 'lime' })
+        this.forwardSphere.mesh = new THREE.Mesh(this.forwardSphere.geometry, this.forwardSphere.material)
+        this.forwardSphere.mesh.position.y = 0.5
+        this.forwardSphere.mesh.position.x = -1
+        this.scenes.forward.add(this.forwardSphere.mesh)
+    }
+
     update()
     {
+        this.lights.update()
+
+        for(const _point of this.pointLights)
+        {
+            _point.angle = (this.time.elapsed + 999) * _point.speed
+            _point.position.x = Math.sin(_point.angle) * _point.distance
+            _point.position.z = Math.cos(_point.angle) * _point.distance
+            _point.position.y = 0.25
+        }
     }
 }

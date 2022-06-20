@@ -15,3 +15,14 @@ npm run dev
 # Build for production in the dist/ directory
 npm run build
 ```
+
+## TODO
+
+- [ ] Point lights
+- [ ] Point lights stress test
+- [ ] Forward rendering
+- [ ] Forward rendering with depth
+- [ ] Point light forward rendering
+- [ ] Fog
+- [ ] Bloom
+- [ ] GLSL partials
