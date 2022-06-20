@@ -31,8 +31,10 @@ export default class World
         for(let i = 0; i < 100; i++)
         {
             const point = this.lights.points.create({
+                position: new THREE.Vector3(0, 0.01 + Math.random() * 0.5, 0),
                 color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-                amplitude: 2
+                amplitude: 5,
+                concentration: 10
             })
             point.angle = Math.random() * Math.PI * 2
             point.distance = (1 - Math.pow(1 - Math.random(), 2)) * 5
@@ -159,7 +161,7 @@ export default class World
             _point.angle = (this.time.elapsed + 999) * _point.speed
             _point.position.x = Math.sin(_point.angle) * _point.distance
             _point.position.z = Math.cos(_point.angle) * _point.distance
-            _point.position.y = 0.25
+            // _point.position.y = 0.25
         }
     }
 }

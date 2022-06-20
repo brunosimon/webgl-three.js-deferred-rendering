@@ -95,6 +95,7 @@ void main()
             vec3 reflection = normalize(reflect(- lightDirection, normal));
             float specularIntensity = max(0.0, dot(viewDirection, reflection));
             specularIntensity = pow(specularIntensity, 1.0 + shininess * 256.0 * specular);
+            specularIntensity *= lightIntensity;
             specularLight += specularIntensity * uPointLights[i].color * specular;
         }
     #endif

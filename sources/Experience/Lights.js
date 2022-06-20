@@ -77,7 +77,7 @@ export default class Lights
             const point = {}
 
             // Position
-            if(typeof _parameters.position !== 'undefined' || !(_parameters.position instanceof THREE.Vector3))
+            if(typeof _parameters.position === 'undefined' || !(_parameters.position instanceof THREE.Vector3))
                 point.position = new THREE.Vector3()
             else
                 point.position = _parameters.position
