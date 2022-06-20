@@ -42,6 +42,9 @@ export default function(_parameters = {})
         defines.USE_MAPNORMAL = ''
 
         uniforms.uMapNormal = { value: _parameters.mapNormal }
+
+        const mapNormalMultiplier = typeof _parameters.mapNormalMultiplier === 'undefined' ? 1 : _parameters.mapNormalMultiplier
+        uniforms.uMapNormalMultiplier = { value: mapNormalMultiplier }
     }
 
     // Final material

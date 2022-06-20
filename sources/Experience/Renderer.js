@@ -200,7 +200,7 @@ export default class Renderer
             this.context.bindFramebuffer(this.context.FRAMEBUFFER, null)
         }
 
-        this.instance.render(this.scenes.forward, this.camera.instance)
+        // this.instance.render(this.scenes.forward, this.camera.instance)
 
         if(this.debug.stats)
             this.debug.stats.afterRender()

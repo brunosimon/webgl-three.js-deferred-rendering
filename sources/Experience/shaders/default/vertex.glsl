@@ -24,6 +24,9 @@ void main()
     vPosition = modelPosition.xyz;
 
     // Normal
+    vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
+    vNormal = modelNormal.xyz;
+
     #ifdef USE_MAPNORMAL
         // vec3 bitangent = cross(normal, tangent);
         vec3 T = normalize(vec3(modelMatrix * vec4(tangent, 0.0)));
@@ -32,9 +35,6 @@ void main()
         vec3 B = cross(N, T);
         mat3 TBN = mat3(T, B, N);
         vTBN = TBN;
-    #else
-        vec4 modelNormal = modelMatrix * vec4(normal, 0.0);
-        vNormal = modelNormal.xyz;
     #endif
 
     // UV

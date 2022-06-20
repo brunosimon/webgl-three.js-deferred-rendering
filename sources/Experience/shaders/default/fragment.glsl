@@ -14,11 +14,11 @@ layout(location = 3) out vec2 outSpecular;
     uniform sampler2D uMapSpecular;
 #endif
 
+in vec3 vNormal;
 #ifdef USE_MAPNORMAL
     uniform sampler2D uMapNormal;
+    uniform float uMapNormalMultiplier;
     in mat3 vTBN;
-#else
-    in vec3 vNormal;
 #endif
 
 uniform vec3 uColor;
@@ -51,6 +51,7 @@ void main()
     #ifdef USE_MAPNORMAL
         outNormal.rgb = texture(uMapNormal, vUv).rgb * 2.0 - 1.0;
         outNormal.rgb = normalize(vTBN * outNormal.rgb);
+        outNormal.rgb = mix(vNormal.rgb, outNormal.rgb, uMapNormalMultiplier);
         // outNormal.rgb = normalize(outNormal.rgb);
     #else
         outNormal = vec4(normalize(vNormal), 0.0);

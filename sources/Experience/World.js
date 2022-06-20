@@ -33,8 +33,9 @@ export default class World
             const point = this.lights.points.create({
                 position: new THREE.Vector3(0, 0.01 + Math.random() * 0.5, 0),
                 color: `hsl(${Math.random() * 360}, 100%, 50%)`,
-                amplitude: 5,
-                concentration: 10
+                amplitude: 2,
+                intensity: 5,
+                concentration: 5
             })
             point.angle = Math.random() * Math.PI * 2
             point.distance = (1 - Math.pow(1 - Math.random(), 2)) * 5
@@ -52,12 +53,13 @@ export default class World
         this.floor.geometry = new THREE.PlaneGeometry(10, 10)
         this.floor.geometry.computeTangents()
         this.floor.material = new DefaultMaterial({
-            shininess: 150,
+            shininess: 32,
             // color: 'red',
             mapColor: this.resources.items.groundColor,
-            specular: 0.1,
+            specular: 1,
             mapSpecular: this.resources.items.groundSpecular,
-            mapNormal: this.resources.items.groundNormal
+            mapNormal: this.resources.items.groundNormal,
+            mapNormalMultiplier: 1
         })
         this.floor.mesh = new THREE.Mesh(this.floor.geometry, this.floor.material)
         this.floor.mesh.rotation.x = - Math.PI * 0.5
@@ -69,6 +71,7 @@ export default class World
 
             folder.add(this.floor.material.uniforms.uSpecular, 'value').min(0).max(1).step(0.001).name('specular')
             folder.add(this.floor.material.uniforms.uShininess, 'value').min(0).max(256).step(1).name('shininess')
+            folder.add(this.floor.material.uniforms.uMapNormalMultiplier, 'value').min(0).max(2).step(0.001).name('mapNormalMultiplier')
         }
     }
 
