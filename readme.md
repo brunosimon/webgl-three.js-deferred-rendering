@@ -1,4 +1,4 @@
-# WebGL Deferred Rendering (Three.js)
+# WebGL (Three.js) Deferred Rendering
 
 ## Setup
 
@@ -26,6 +26,9 @@ npm run build
 - [x] Point light forward rendering
 - [ ] Fog
 - [ ] Bloom
+- [ ] Reflection
+- [ ] SSAO
+- [ ] Antialias
 - [ ] GLSL partials
 
 # Resources
