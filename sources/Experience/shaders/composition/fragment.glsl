@@ -13,13 +13,13 @@ struct HemiLight {
     vec3 direction;
 };
 
-struct PointLight {
-    vec3 position;
-    vec3 color;
-    float intensity;
-    float amplitude;
-    float concentration;
-};
+// struct PointLight {
+//     vec3 position;
+//     vec3 color;
+//     float intensity;
+//     float amplitude;
+//     float concentration;
+// };
 
 in vec2 vUv;
 
@@ -31,10 +31,10 @@ uniform AmbientLight uAmbientLight;
 uniform HemiLight uHemiLight;
 uniform vec3 viewPosition;
 
-#if (MAX_LIGHTS > 0)
-    uniform int uPointLightsCount;
-    uniform PointLight uPointLights[MAX_LIGHTS];
-#endif
+// #if (MAX_LIGHTS > 0)
+//     uniform int uPointLightsCount;
+//     uniform PointLight uPointLights[MAX_LIGHTS];
+// #endif
 
 layout(location = 0) out vec4 pc_FragColor;
 
@@ -77,36 +77,43 @@ void main()
     vec3 hemiLightColor = mix(uHemiLight.groundColor, uHemiLight.skyColor, hemiLightMix) * uHemiLight.intensity;
 
     light = ambientLightColor + hemiLightColor;
+    vec3 outColor = color * light;
 
-    // Points
-    #if (MAX_LIGHTS > 0)
-        for(int i = 0; i < uPointLightsCount; ++i)
-        {
-            float lightDistance = distance(position, uPointLights[i].position);
-            
-            float lightIntensity = 1.0 - clamp(inverseLerp(lightDistance, 0.0, uPointLights[i].amplitude), 0.0, 1.0);
-            lightIntensity = pow(lightIntensity, uPointLights[i].concentration);
-            lightIntensity *= uPointLights[i].intensity;
-            
-            vec3 lightDirection = normalize(uPointLights[i].position - position);
-            
-            light += max(dot(normal, lightDirection), 0.0) * lightIntensity * uPointLights[i].color;
+    // // Points
+    // #if (MAX_LIGHTS > 0)
+    //     for(int i = 0; i < uPointLightsCount; ++i)
+    //     {
+    //         vec3 light = vec3(0.0);
+    //         vec3 specularLight = vec3(0.0);
 
-            vec3 reflection = normalize(reflect(- lightDirection, normal));
-            float specularIntensity = max(0.0, dot(viewDirection, reflection));
-            specularIntensity = pow(specularIntensity, 1.0 + shininess * 256.0 * specular);
-            specularIntensity *= lightIntensity;
-            specularLight += specularIntensity * uPointLights[i].color * specular;
-        }
-    #endif
+    //         float lightDistance = distance(position, uPointLights[i].position);
+            
+    //         float lightIntensity = 1.0 - clamp(inverseLerp(lightDistance, 0.0, uPointLights[i].amplitude), 0.0, 1.0);
+    //         lightIntensity = pow(lightIntensity, uPointLights[i].concentration);
+    //         lightIntensity *= uPointLights[i].intensity;
+            
+    //         vec3 lightDirection = normalize(uPointLights[i].position - position);
+            
+    //         light += max(dot(normal, lightDirection), 0.0) * lightIntensity * uPointLights[i].color;
+
+    //         vec3 reflection = normalize(reflect(- lightDirection, normal));
+    //         float specularIntensity = max(0.0, dot(viewDirection, reflection));
+    //         specularIntensity = pow(specularIntensity, 1.0 + shininess * 256.0 * specular);
+    //         specularIntensity *= lightIntensity;
+    //         specularLight += specularIntensity * uPointLights[i].color * specular;
+
+    //         vec3 temp = color * light + specularLight;
+    //         // temp = pow(temp, vec3(1.0 / 2.2));
+    //         outColor += temp;
+    //     }
+    // #endif
     
     /**
      * Final color
      */
-    vec3 outColor = color * light + specularLight;
 
-    // Gamma corection
-    outColor.rgb = pow(outColor.rgb, vec3(1.0 / 2.2));
+    // // Gamma corection
+    // outColor.rgb = pow(outColor.rgb, vec3(1.0 / 2.2));
 
     // Debug
     #ifdef USE_DEBUG

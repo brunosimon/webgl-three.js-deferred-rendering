@@ -1,14 +1,17 @@
 import Experience from '@/Experience.js'
 import * as THREE from 'three'
+import PointLightMaterial from './Materials/PointLightMaterial.js'
 
 export default class Lights
 {
     constructor()
     {
         this.experience = new Experience()
+        this.camera = this.experience.camera
         this.scenes = this.experience.scenes
         this.debug = this.experience.debug
         this.renderer = this.experience.renderer
+        this.viewport = this.experience.viewport
 
         this.setAmbient()
         this.setHemi()
@@ -19,7 +22,7 @@ export default class Lights
     {
         this.ambient = {}
         this.ambient.color = new THREE.Color('white')
-        this.ambient.intensity = 0
+        this.ambient.intensity = 0.1
         this.ambient.updateUniforms = () =>
         {
             this.renderer.composition.material.uniforms.uAmbientLight.value.color = this.ambient.color
@@ -41,7 +44,7 @@ export default class Lights
         this.hemi = {}
         this.hemi.groundColor = new THREE.Color('#3300ff')
         this.hemi.skyColor = new THREE.Color('#ff6600')
-        this.hemi.intensity = 0
+        this.hemi.intensity = 0.2
         this.hemi.direction = new THREE.Vector3(-0.2, 0.2, 0.09)
         this.hemi.updateUniforms = () =>
         {
@@ -71,6 +74,8 @@ export default class Lights
         this.points.max = 100
         this.points.items = []
         this.points.needsUpdate = false
+        this.points.geometry = new THREE.IcosahedronGeometry(1, 1)
+        // this.points.material = new PointLightMaterial(this.renderer.composition.renderTarget)
 
         this.points.create = (_parameters = {}) =>
         {
@@ -111,6 +116,17 @@ export default class Lights
                 point.concentration = _parameters.concentration
             else
                 point.concentration = 5
+
+            // Sphere
+            point.sphere = new THREE.Mesh(
+                this.points.geometry,
+                new PointLightMaterial(this.renderer.deferred.renderTarget)
+                // new THREE.MeshBasicMaterial({ color: 'red' })
+            )
+            point.sphere.scale.set(point.amplitude, point.amplitude, point.amplitude)
+            point.sphere.material.uniforms.uPointLight.value = point
+            point.sphere.material.uniforms.uResolution.value.set(this.viewport.elementWidth, this.viewport.elementHeight)
+            this.scenes.forward.add(point.sphere)
            
             this.points.items.push(point)
 
@@ -123,31 +139,31 @@ export default class Lights
         
         this.points.updateUniforms = () =>
         {
-            // Count
-            this.renderer.composition.material.uniforms.uPointLightsCount.value = this.points.items.length
+            // // Count
+            // this.renderer.composition.material.uniforms.uPointLightsCount.value = this.points.items.length
 
-            // Lights
-            const uPointLights = [...this.points.items]
+            // // Lights
+            // const uPointLights = [...this.points.items]
             
-            const dummyLight = {
-                position: new THREE.Vector3(0, 0, 0),
-                color: new THREE.Color(),
-                intensity: 0,
-                amplitude: 0,
-                concentration: 0
-            }
+            // const dummyLight = {
+            //     position: new THREE.Vector3(0, 0, 0),
+            //     color: new THREE.Color(),
+            //     intensity: 0,
+            //     amplitude: 0,
+            //     concentration: 0
+            // }
 
-            // Fill with dummy lights
-            for(let i = this.points.items.length; i < this.points.max; i++)
-                uPointLights.push(dummyLight)
-            this.renderer.composition.material.uniforms.uPointLights.value = uPointLights
+            // // Fill with dummy lights
+            // for(let i = this.points.items.length; i < this.points.max; i++)
+            //     uPointLights.push(dummyLight)
+            // this.renderer.composition.material.uniforms.uPointLights.value = uPointLights
 
-            // Max changed
-            if(this.points.max !== this.renderer.composition.material.defines.MAX_LIGHTS)
-            {
-                this.renderer.composition.material.defines.MAX_LIGHTS = this.points.max
-                this.renderer.composition.material.needsUpdate = true
-            }
+            // // Max changed
+            // if(this.points.max !== this.renderer.composition.material.defines.MAX_LIGHTS)
+            // {
+            //     this.renderer.composition.material.defines.MAX_LIGHTS = this.points.max
+            //     this.renderer.composition.material.needsUpdate = true
+            // }
         }
     }
 
@@ -157,6 +173,12 @@ export default class Lights
         {
             this.points.needsUpdate = false
             this.points.updateUniforms()
+        }
+
+        for(const _point of this.points.items)
+        {
+            _point.sphere.material.uniforms.viewPosition.value.copy(this.camera.instance.position)
+            _point.sphere.position.copy(_point.position)
         }
     }
 }

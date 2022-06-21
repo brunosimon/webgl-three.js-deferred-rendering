@@ -21,9 +21,9 @@ npm run build
 - [x] Point lights
 - [x] Point lights stress test
 - [ ] Resize
-- [ ] Forward rendering
-- [ ] Forward rendering with depth
-- [ ] Point light forward rendering
+- [x] Forward rendering
+- [x] Forward rendering with depth
+- [x] Point light forward rendering
 - [ ] Fog
 - [ ] Bloom
 - [ ] GLSL partials
