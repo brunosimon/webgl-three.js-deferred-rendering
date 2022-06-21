@@ -3,9 +3,9 @@ export default [
         name: 'test',
         itemsToLoad:
         [
-            { name: 'groundColor', source: 'textures/groundColor.jpg', type: 'texture' },
-            { name: 'groundNormal', source: 'textures/groundNormal.jpg', type: 'texture' },
-            { name: 'groundSpecular', source: 'textures/groundSpecular.jpg', type: 'texture' },
+            { name: 'groundColor', source: 'textures/ground2Color.jpg', type: 'texture' },
+            { name: 'groundNormal', source: 'textures/ground2Normal.jpg', type: 'texture' },
+            { name: 'groundSpecular', source: 'textures/ground2Specular.jpg', type: 'texture' },
             
             { name: 'bricksColor', source: 'textures/bricksColor.jpg', type: 'texture' },
             { name: 'bricksNormal', source: 'textures/bricksNormal.jpg', type: 'texture' },

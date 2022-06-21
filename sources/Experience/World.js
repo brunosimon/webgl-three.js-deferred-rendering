@@ -19,7 +19,6 @@ export default class World
         this.setCube()
         this.setTorusKnot()
         this.setSphere()
-        this.setForwardSphere()
     }
 
     setLights()
@@ -30,16 +29,28 @@ export default class World
 
         for(let i = 0; i < 100; i++)
         {
-            const point = this.lights.points.create({
+            const point = {}
+
+            const color = `hsl(${Math.random() * 360}, 100%, 50%)`
+
+            point.light = this.lights.points.create({
                 position: new THREE.Vector3(0, 0.01 + Math.random() * 0.5, 0),
-                color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                color,
                 amplitude: 2,
                 intensity: 5,
                 concentration: 5
             })
+
             point.angle = Math.random() * Math.PI * 2
             point.distance = (1 - Math.pow(1 - Math.random(), 2)) * 5
             point.speed = Math.random() * 1
+            point.timeOffset = Math.random() * Math.PI * 2
+
+            point.sphere = new THREE.Mesh(
+                new THREE.IcosahedronGeometry(0.02, 1),
+                new THREE.MeshBasicMaterial({ color: color })
+            )
+            this.scenes.forward.add(point.sphere)
 
             this.pointLights.push(point)
         }
@@ -144,17 +155,6 @@ export default class World
         this.scenes.deferred.add(this.sphere.mesh)
     }
 
-    setForwardSphere()
-    {
-        this.forwardSphere = {}
-        this.forwardSphere.geometry = new THREE.SphereGeometry(0.49, 32, 32)
-        this.forwardSphere.material = new THREE.MeshBasicMaterial({ color: 'lime' })
-        this.forwardSphere.mesh = new THREE.Mesh(this.forwardSphere.geometry, this.forwardSphere.material)
-        this.forwardSphere.mesh.position.y = 0.5
-        this.forwardSphere.mesh.position.x = -1
-        this.scenes.forward.add(this.forwardSphere.mesh)
-    }
-
     resize()
     {
         this.lights.resize()
@@ -166,12 +166,12 @@ export default class World
 
         for(const _point of this.pointLights)
         {
-            _point.angle = (this.time.elapsed + 999) * _point.speed
-            _point.position.x = Math.sin(_point.angle) * _point.distance
-            _point.position.z = Math.cos(_point.angle) * _point.distance
-            // _point.position.y = 0.25
-        }
+            _point.angle = _point.timeOffset + this.time.elapsed * 0.4 * _point.speed
+            _point.light.position.x = Math.sin(_point.angle) * _point.distance
+            _point.light.position.z = Math.cos(_point.angle) * _point.distance
+            _point.light.position.y = Math.sin(_point.timeOffset + this.time.elapsed * 2) * 0.5 + 0.51
 
-        this.forwardSphere.mesh.position.x = Math.sin(this.time.elapsed) * 4
+            _point.sphere.position.copy(_point.light.position)
+        }
     }
 }
