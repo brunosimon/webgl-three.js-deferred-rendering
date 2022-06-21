@@ -75,6 +75,10 @@ export default class Lights
         this.points.items = []
         this.points.needsUpdate = false
         this.points.geometry = new THREE.IcosahedronGeometry(1, 1)
+        this.points.commonUniforms = {
+            uResolution: { value: new THREE.Vector2(this.viewport.elementWidth * this.viewport.clampedPixelRatio, this.viewport.elementHeight * this.viewport.clampedPixelRatio) },
+            uViewPosition: { value: new THREE.Vector3(this.camera.instance.position.x, this.camera.instance.position.y, this.camera.instance.position.z) }
+        }
         // this.points.material = new PointLightMaterial(this.renderer.composition.renderTarget)
 
         this.points.create = (_parameters = {}) =>
@@ -125,7 +129,8 @@ export default class Lights
             )
             point.sphere.scale.set(point.amplitude, point.amplitude, point.amplitude)
             point.sphere.material.uniforms.uPointLight.value = point
-            point.sphere.material.uniforms.uResolution.value.set(this.viewport.elementWidth, this.viewport.elementHeight)
+            point.sphere.material.uniforms.uResolution = this.points.commonUniforms.uResolution
+            point.sphere.material.uniforms.uViewPosition = this.points.commonUniforms.uViewPosition
             this.scenes.forward.add(point.sphere)
            
             this.points.items.push(point)
@@ -167,6 +172,11 @@ export default class Lights
         }
     }
 
+    resize()
+    {
+        this.points.commonUniforms.uResolution.value.set(this.viewport.elementWidth * this.viewport.clampedPixelRatio, this.viewport.elementHeight * this.viewport.clampedPixelRatio)
+    }
+
     update()
     {
         if(this.points.needsUpdate)
@@ -175,9 +185,9 @@ export default class Lights
             this.points.updateUniforms()
         }
 
+        this.points.commonUniforms.uViewPosition.value.copy(this.camera.instance.position)
         for(const _point of this.points.items)
         {
-            _point.sphere.material.uniforms.viewPosition.value.copy(this.camera.instance.position)
             _point.sphere.position.copy(_point.position)
         }
     }

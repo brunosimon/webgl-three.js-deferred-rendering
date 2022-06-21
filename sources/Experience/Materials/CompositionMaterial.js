@@ -65,7 +65,7 @@ export default function(_renderTargets, debug = false)
     // defines.MAX_LIGHTS = 3
 
     // View
-    uniforms.viewPosition = { value: new THREE.Vector3(5, 5, -5) }
+    uniforms.uViewPosition = { value: new THREE.Vector3(5, 5, -5) }
 
     // Debug
     if(debug)

@@ -13,7 +13,7 @@ uniform sampler2D uPosition;
 uniform sampler2D uColor;
 uniform sampler2D uNormal;
 uniform sampler2D uSpecular;
-uniform vec3 viewPosition;
+uniform vec3 uViewPosition;
 uniform vec2 uResolution;
 
 uniform PointLight uPointLight;
@@ -44,7 +44,7 @@ void main()
     float specular = specularShininess.r;
     float shininess = specularShininess.g;
 
-    vec3 viewDirection = normalize(viewPosition - position);
+    vec3 viewDirection = normalize(uViewPosition - position);
 
     /**
      * Lights

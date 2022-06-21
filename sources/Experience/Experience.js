@@ -83,5 +83,8 @@ export default class Experience extends EventEmitter
         this.viewport.resize()
         this.camera.resize()
         this.renderer.resize()
+
+        if(this.world)
+            this.world.resize()
     }
 }

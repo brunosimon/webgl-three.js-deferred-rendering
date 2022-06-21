@@ -178,6 +178,12 @@ export default class Renderer
         // Instance
         this.instance.setSize(this.viewport.elementWidth, this.viewport.elementHeight)
         this.instance.setPixelRatio(this.viewport.clampedPixelRatio)
+
+        // Composition
+        this.composition.renderTarget.setSize(this.viewport.elementWidth * this.viewport.clampedPixelRatio, this.viewport.elementHeight * this.viewport.clampedPixelRatio)
+
+        // Final
+        this.deferred.renderTarget.setSize(this.viewport.elementWidth * this.viewport.clampedPixelRatio, this.viewport.elementHeight * this.viewport.clampedPixelRatio)
     }
 
     update()
@@ -192,7 +198,7 @@ export default class Renderer
         this.instance.autoClear = false
 
         // Composition render
-        this.composition.material.uniforms.viewPosition.value.copy(this.camera.instance.position)
+        this.composition.material.uniforms.uViewPosition.value.copy(this.camera.instance.position)
         this.instance.setRenderTarget(this.composition.renderTarget)
         this.instance.render(this.scenes.composition, this.camera.instance)
             

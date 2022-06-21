@@ -27,7 +27,7 @@ export default function(_renderTargets)
     }
 
     // View
-    uniforms.viewPosition = { value: new THREE.Vector3(5, 5, -5) }
+    uniforms.uViewPosition = { value: new THREE.Vector3(5, 5, -5) }
     uniforms.uResolution = { value: new THREE.Vector2(1280, 1024) }
 
     // Final material

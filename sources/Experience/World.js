@@ -155,6 +155,11 @@ export default class World
         this.scenes.forward.add(this.forwardSphere.mesh)
     }
 
+    resize()
+    {
+        this.lights.resize()
+    }
+
     update()
     {
         this.lights.update()

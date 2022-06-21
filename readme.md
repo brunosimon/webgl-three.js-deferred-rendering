@@ -20,7 +20,7 @@ npm run build
 
 - [x] Point lights
 - [x] Point lights stress test
-- [ ] Resize
+- [x] Resize
 - [x] Forward rendering
 - [x] Forward rendering with depth
 - [x] Point light forward rendering
