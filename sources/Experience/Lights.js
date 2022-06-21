@@ -22,7 +22,7 @@ export default class Lights
     {
         this.ambient = {}
         this.ambient.color = new THREE.Color('white')
-        this.ambient.intensity = 0.1
+        this.ambient.intensity = 0
         this.ambient.updateUniforms = () =>
         {
             this.renderer.composition.material.uniforms.uAmbientLight.value.color = this.ambient.color
@@ -44,7 +44,7 @@ export default class Lights
         this.hemi = {}
         this.hemi.groundColor = new THREE.Color('#3300ff')
         this.hemi.skyColor = new THREE.Color('#ff6600')
-        this.hemi.intensity = 0.2
+        this.hemi.intensity = 0.4
         this.hemi.direction = new THREE.Vector3(-0.2, 0.2, 0.09)
         this.hemi.updateUniforms = () =>
         {
