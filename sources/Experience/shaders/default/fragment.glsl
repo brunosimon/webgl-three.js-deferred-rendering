@@ -1,8 +1,8 @@
 precision highp float;
 precision highp int;
 
-layout(location = 0) out vec4 outPosition;
-layout(location = 1) out vec4 outColor;
+layout(location = 0) out vec4 outColor;
+layout(location = 1) out vec4 outPosition;
 layout(location = 2) out vec4 outNormal;
 layout(location = 3) out vec2 outSpecular;
 

@@ -35,9 +35,7 @@ export default class Experience extends EventEmitter
         })
         this.scenes = {
             deferred: new THREE.Scene(),
-            forward: new THREE.Scene(),
-            composition: new THREE.Scene(),
-            final: new THREE.Scene()
+            forward: new THREE.Scene()
         }
         this.camera = new Camera()
         this.time = new Time()

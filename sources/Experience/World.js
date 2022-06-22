@@ -1,5 +1,6 @@
 import Experience from '@/Experience.js'
 import DefaultMaterial from '@/Materials/DefaultMaterial.js'
+import GlowMaterial from '@/Materials/GlowMaterial.js'
 import * as THREE from 'three'
 import Lights from './Lights'
 
@@ -27,11 +28,11 @@ export default class World
 
         this.pointLights = []
 
-        for(let i = 0; i < 100; i++)
+        for(let i = 0; i < 60; i++)
         {
             const point = {}
 
-            const color = `hsl(${Math.random() * 360}, 100%, 50%)`
+            const color = `hsl(${Math.random() * 360}, 100%, 60%)`
 
             point.light = this.lights.points.create({
                 position: new THREE.Vector3(0, 0.01 + Math.random() * 0.5, 0),
@@ -48,13 +49,54 @@ export default class World
 
             point.sphere = new THREE.Mesh(
                 new THREE.IcosahedronGeometry(0.02, 1),
-                new THREE.MeshBasicMaterial({ color: color })
+                new GlowMaterial({ color: color, intensity: 5 })
             )
-            this.scenes.forward.add(point.sphere)
+            this.scenes.deferred.add(point.sphere)
 
             this.pointLights.push(point)
         }
+
+        this.mainLight = {}
+        this.mainLight.color = '#ff8833'
+        this.mainLight.intensity = 10
+        this.mainLight.position = new THREE.Vector3(0, 0.5, 0)
+        this.mainLight.light = this.lights.points.create({
+            position: new THREE.Vector3(0, 0.5, 0),
+            color: this.mainLight.color,
+            amplitude: 5,
+            intensity: this.mainLight.intensity,
+            concentration: 2
+        })
+
+        this.mainLight.sphere = new THREE.Mesh(
+            new THREE.IcosahedronGeometry(0.25, 3),
+            new GlowMaterial({ color: this.mainLight.color, intensity: this.mainLight.intensity })
+        )
+        this.scenes.deferred.add(this.mainLight.sphere)
+
         
+        if(this.debug.active)
+        {
+            const folder = this.debug.ui.getFolder('world/mainLight')
+
+            folder
+                .addColor(this.mainLight, 'color')
+                .onChange(() =>
+                {
+                    this.mainLight.sphere.material.uniforms.uColor.value.set(this.mainLight.color)
+                    this.mainLight.light.color.set(this.mainLight.color)
+                })
+
+            folder
+                .add(this.mainLight, 'intensity').min(1).max(50).step(0.1)
+                .onChange(() =>
+                {
+                    this.mainLight.sphere.material.uniforms.uIntensity.value = this.mainLight.intensity
+                    this.mainLight.light.intensity = this.mainLight.intensity
+                })
+            // folder.add(this.floor.material.uniforms.uShininess, 'value').min(0).max(256).step(1).name('shininess')
+            // folder.add(this.floor.material.uniforms.uMapNormalMultiplier, 'value').min(0).max(2).step(0.001).name('mapNormalMultiplier')
+        }
     }
 
     setFloor()
@@ -143,6 +185,8 @@ export default class World
         this.sphere.geometry = new THREE.SphereGeometry(0.75, 32, 32)
         this.sphere.geometry.computeTangents()
         this.sphere.material = new DefaultMaterial({
+            // color: '#ff6666',
+            // intensity: 2,
             specular: 0.25,
             shininess: 128,
             mapColor: this.resources.items.woodColor,
@@ -173,5 +217,11 @@ export default class World
 
             _point.sphere.position.copy(_point.light.position)
         }
+
+        this.mainLight.position.x = Math.sin(this.time.elapsed * 0.2) * 3.5
+        this.mainLight.position.z = Math.cos(this.time.elapsed * 0.2) * 3.5
+
+        this.mainLight.light.position.copy(this.mainLight.position)
+        this.mainLight.sphere.position.copy(this.mainLight.position)
     }
 }

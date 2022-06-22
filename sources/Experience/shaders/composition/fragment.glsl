@@ -23,10 +23,11 @@ struct HemiLight {
 
 in vec2 vUv;
 
-uniform sampler2D uPosition;
 uniform sampler2D uColor;
+uniform sampler2D uPosition;
 uniform sampler2D uNormal;
 uniform sampler2D uSpecular;
+uniform sampler2D uBloom;
 uniform AmbientLight uAmbientLight;
 uniform HemiLight uHemiLight;
 uniform vec3 uViewPosition;
@@ -49,16 +50,31 @@ float remap(float v, float inMin, float inMax, float outMin, float outMax)
     return mix(outMin, outMax, t);
 }
 
+float blendAdd(float base, float blend)
+{
+	return min(base+blend,1.0);
+}
+
+vec3 blendAdd(vec3 base, vec3 blend)
+{
+	return min(base+blend,vec3(1.0));
+}
+
+vec3 blendAdd(vec3 base, vec3 blend, float opacity)
+{
+	return (blendAdd(base, blend) * opacity + base * (1.0 - opacity));
+}
+
 void main()
 {
     // Buffers
     vec3 position = texture(uPosition, vUv).rgb;
     vec3 color = texture(uColor, vUv).rgb;
     vec3 normal = texture(uNormal, vUv).rgb;
-
     vec2 specularShininess = texture(uSpecular, vUv).rg;
     float specular = specularShininess.r;
     float shininess = specularShininess.g;
+    vec3 bloom = texture(uBloom, vUv).rgb;
 
     vec3 viewDirection = normalize(uViewPosition - position);
 
@@ -78,6 +94,8 @@ void main()
 
     light = ambientLightColor + hemiLightColor;
     vec3 outColor = color * light;
+
+    // outColor += max(vec3(0.0), color - 1.0);
 
     // // Points
     // #if (MAX_LIGHTS > 0)
@@ -107,6 +125,9 @@ void main()
     //         outColor += temp;
     //     }
     // #endif
+
+    // Bloom
+    outColor.rgb = blendAdd(outColor.rgb, bloom.rgb);
     
     /**
      * Final color
@@ -124,5 +145,6 @@ void main()
     #endif
 
     pc_FragColor = vec4(outColor, 1.0);
+    // pc_FragColor = vec4(bloom.rgb, 1.0);
     // pc_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
 }

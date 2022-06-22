@@ -3,16 +3,16 @@ import * as THREE from 'three'
 import vertexShader from '../shaders/pointLight/vertex.glsl'
 import fragmentShader from '../shaders/pointLight/fragment.glsl'
 
-export default function(_renderTargets)
+export default function(_renderTarget)
 {
     const uniforms = {}
     const defines = {}
 
     // Buffers
-    uniforms.uPosition = { value: _renderTargets.texture[0] }
-    uniforms.uColor = { value: _renderTargets.texture[1] }
-    uniforms.uNormal = { value: _renderTargets.texture[2] }
-    uniforms.uSpecular = { value: _renderTargets.texture[3] }
+    uniforms.uColor = { value: _renderTarget.texture[0] }
+    uniforms.uPosition = { value: _renderTarget.texture[1] }
+    uniforms.uNormal = { value: _renderTarget.texture[2] }
+    uniforms.uSpecular = { value: _renderTarget.texture[3] }
 
     // Point lights
     uniforms.uPointLight = {

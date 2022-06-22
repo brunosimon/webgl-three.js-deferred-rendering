@@ -3,16 +3,17 @@ import * as THREE from 'three'
 import vertexShader from '../shaders/composition/vertex.glsl'
 import fragmentShader from '../shaders/composition/fragment.glsl'
 
-export default function(_renderTargets, debug = false)
+export default function(_deferredRenderTarget, _bloomRenderTarget, debug = false)
 {
     const uniforms = {}
     const defines = {}
 
     // Buffers
-    uniforms.uPosition = { value: _renderTargets.texture[0] }
-    uniforms.uColor = { value: _renderTargets.texture[1] }
-    uniforms.uNormal = { value: _renderTargets.texture[2] }
-    uniforms.uSpecular = { value: _renderTargets.texture[3] }
+    uniforms.uColor = { value: _deferredRenderTarget.texture[0] }
+    uniforms.uPosition = { value: _deferredRenderTarget.texture[1] }
+    uniforms.uNormal = { value: _deferredRenderTarget.texture[2] }
+    uniforms.uSpecular = { value: _deferredRenderTarget.texture[3] }
+    uniforms.uBloom = { value: _bloomRenderTarget.texture }
 
     // Ambient light
     uniforms.uAmbientLight = {
